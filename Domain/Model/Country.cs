@@ -4,5 +4,7 @@ public enum Country
 {
     NL,
     GB,
-    DE
+    DE,
+
+    UNSUPPORTED
 }
