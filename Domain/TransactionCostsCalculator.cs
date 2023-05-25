@@ -4,7 +4,7 @@ namespace Domain;
 
 public static class TransactionCostsCalculator
 {
-    public static decimal CalculateTransactionCosts(Transaction transaction, LegalEntityRecord entityRecord)
+    public static decimal? CalculateTransactionCosts(Transaction transaction, LegalEntityRecord entityRecord)
     {
         if (transaction.Rate <= 0)
         {
@@ -15,8 +15,7 @@ public static class TransactionCostsCalculator
         {
             Country.NL => Math.Abs(transaction.NotionalValue / transaction.Rate - transaction.NotionalValue),
             Country.GB => transaction.NotionalValue * transaction.Rate - transaction.NotionalValue,
-            _ => throw new ArgumentOutOfRangeException(nameof(entityRecord.Country),
-                "the country for this entity is outside the accepted countries for this calculation")
+            _ => null
         };
 
     }

@@ -22,10 +22,10 @@ public record EnrichedTransaction(
     LEI EntityId,
     string EntityName,
     ICollection<string> EntityBICs,
-    decimal TransactionCosts) : Transaction(Id, ISIN, NotionalValue, NotionalCurrency, Timestamp, Rate, EntityId)
+    decimal? TransactionCosts) : Transaction(Id, ISIN, NotionalValue, NotionalCurrency, Timestamp, Rate, EntityId)
 {
     public EnrichedTransaction(
-        Transaction transaction, string entityName, ICollection<string> entityBICs, decimal transactionCosts) :
+        Transaction transaction, string entityName, ICollection<string> entityBICs, decimal? transactionCosts) :
         this(transaction.Id, transaction.ISIN, transaction.NotionalValue,
             transaction.NotionalCurrency, transaction.Timestamp, transaction.Rate, transaction.EntityId, entityName,
             entityBICs, transactionCosts) { }

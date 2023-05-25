@@ -23,9 +23,9 @@ public class GleifLegalEntityDataClient : IDisposable, ILegalEntityDataClient
     public async IAsyncEnumerable<LegalEntityRecord> RetrieveLegalEntityRecordForTransactions(IEnumerable<Transaction> transactions, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         var entityIdBatches = _batcher.BatchTransactionRequestEntityIds(transactions);
-
         var entityBatchTasks = entityIdBatches.Select(batch => RequestEntityRecords(batch.ToList(), cancellationToken)).ToList();
 
+        //Stream task results as they complete
         while (entityBatchTasks.Any())
         {
             await Task.WhenAny(entityBatchTasks);
@@ -61,7 +61,7 @@ public class GleifLegalEntityDataClient : IDisposable, ILegalEntityDataClient
         var response = await _client.ExecuteGetAsync<GleifResponseDto<LeiRecordDto>>(request, cancellationToken);
         if (!response.IsSuccessful)
         {
-            //TODO: handle error gracefully
+            //TODO: handle error gracefully (cancellation gets caught here too)
             throw response.ErrorException ?? new Exception("bleh");
         }
 
