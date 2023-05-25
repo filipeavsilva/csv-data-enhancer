@@ -1,7 +1,9 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Net;
+using System.Runtime.CompilerServices;
 using DataRetrieval.DTOs;
 using Domain.Model;
 using Domain.Ports;
+using Polly;
 using RestSharp;
 
 namespace DataRetrieval;
@@ -30,11 +32,13 @@ public class GleifLegalEntityDataClient : IDisposable, ILegalEntityDataClient
         {
             await Task.WhenAny(entityBatchTasks);
 
+            cancellationToken.ThrowIfCancellationRequested();
+
             var completedTasks = entityBatchTasks.Where(t => t.IsCompleted).ToList();
             entityBatchTasks = entityBatchTasks.Except(completedTasks).ToList();
 
-            //TODO: Handle faulted and cancelled tasks, as well as cancellation token
-            var results = completedTasks.SelectMany(task => task.Result);
+            var results = completedTasks.SelectMany(task =>
+                task.IsCompletedSuccessfully ? task.Result : new List<LegalEntityRecord>());
 
             foreach (var result in results)
             {
@@ -58,11 +62,17 @@ public class GleifLegalEntityDataClient : IDisposable, ILegalEntityDataClient
         request.AddParameter("page[size]", entityIds.Count);
         request.AddParameter("page[number]", 1);
 
-        var response = await _client.ExecuteGetAsync<GleifResponseDto<LeiRecordDto>>(request, cancellationToken);
+        var response = await Policy
+            .HandleResult<RestResponse<GleifResponseDto<LeiRecordDto>>>(response => !response.IsSuccessful && response.StatusCode != HttpStatusCode.TooManyRequests)
+            .WaitAndRetryAsync(3, _ => TimeSpan.FromMilliseconds(100))
+            .ExecuteAsync(async () =>
+                await _client.ExecuteGetAsync<GleifResponseDto<LeiRecordDto>>(request, cancellationToken));
+
         if (!response.IsSuccessful)
         {
-            //TODO: handle error gracefully (cancellation gets caught here too)
-            throw response.ErrorException ?? new Exception("bleh");
+            throw response.ErrorException ??
+                  new Exception(
+                      $"Request to GLEIF API failed. Error code: {response.StatusCode}. Error message: {response.ErrorMessage ?? "(empty)"}");
         }
 
         return response.Data?.Data.Select(record => record.Map()).ToList() ?? new List<LegalEntityRecord>();
