@@ -1,4 +1,5 @@
-﻿using DataRetrieval.DTOs;
+﻿using System.Runtime.CompilerServices;
+using DataRetrieval.DTOs;
 using Domain.Model;
 using Domain.Ports;
 using RestSharp;
@@ -7,36 +8,63 @@ namespace DataRetrieval;
 
 public class GleifLegalEntityDataClient : IDisposable, ILegalEntityDataClient
 {
-    private readonly RestClient _client;
+    private const string Resource = "lei-records";
+    private const string LeiFilterParameterName = "filter[lei]";
 
-    public GleifLegalEntityDataClient(RestClient client)
+    private readonly RestClient _client;
+    private readonly TransactionRequestBatcher _batcher;
+
+    public GleifLegalEntityDataClient(RestClient client, TransactionRequestBatcher batcher)
     {
         _client = client;
+        _batcher = batcher;
     }
-    public async Task<IEnumerable<LegalEntityRecord>> RetrieveLegalEntityRecordForTransactions(IEnumerable<Transaction> transactions)
+
+    public async IAsyncEnumerable<LegalEntityRecord> RetrieveLegalEntityRecordForTransactions(IEnumerable<Transaction> transactions, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        const string resource = "lei-records";
-        var request = new RestRequest(resource);
+        var entityIdBatches = _batcher.BatchTransactionRequestEntityIds(transactions);
 
-        var transactionLeis = transactions.Select(t => t.EntityId).Distinct();
-        var leiParameterString = string.Join(',', transactionLeis.Select(lei => lei.ToString())); //TODO: Batch to avoid too large URLs
+        var entityBatchTasks = entityIdBatches.Select(batch => RequestEntityRecords(batch.ToList(), cancellationToken)).ToList();
 
-        request.AddParameter("filter[lei]", leiParameterString);
-
-        var response = await _client.ExecuteGetAsync<GleifResponseDto<LeiRecordDto>>(request);
-
-        if (!response.IsSuccessful)
+        while (entityBatchTasks.Any())
         {
-            //TODO: handle error gracefully
-            throw response.ErrorException ?? new Exception("bleh");
-        }
+            await Task.WhenAny(entityBatchTasks);
 
-        return response.Data?.Data.Select(record => record.Map()) ?? new List<LegalEntityRecord>();
+            var completedTasks = entityBatchTasks.Where(t => t.IsCompleted).ToList();
+            entityBatchTasks = entityBatchTasks.Except(completedTasks).ToList();
+
+            //TODO: Handle faulted and cancelled tasks, as well as cancellation token
+            var results = completedTasks.SelectMany(task => task.Result);
+
+            foreach (var result in results)
+            {
+                yield return result;
+            }
+        }
     }
 
     public void Dispose()
     {
         _client.Dispose();
         GC.SuppressFinalize(this);
+    }
+
+    private async Task<ICollection<LegalEntityRecord>> RequestEntityRecords(ICollection<LEI> entityIds, CancellationToken cancellationToken)
+    {
+        var request = new RestRequest(Resource);
+
+        var leiParameterString = string.Join(',', entityIds.Select(lei => lei.ToString()));
+        request.AddParameter(LeiFilterParameterName, leiParameterString);
+        request.AddParameter("page[size]", entityIds.Count);
+        request.AddParameter("page[number]", 1);
+
+        var response = await _client.ExecuteGetAsync<GleifResponseDto<LeiRecordDto>>(request, cancellationToken);
+        if (!response.IsSuccessful)
+        {
+            //TODO: handle error gracefully
+            throw response.ErrorException ?? new Exception("bleh");
+        }
+
+        return response.Data?.Data.Select(record => record.Map()).ToList() ?? new List<LegalEntityRecord>();
     }
 }
