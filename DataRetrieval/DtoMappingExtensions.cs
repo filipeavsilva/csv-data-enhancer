@@ -13,6 +13,6 @@ public static class DtoMappingExtensions
             country = Country.UNSUPPORTED;
         }
 
-        return new LegalEntityRecord(new LEI(dto.Attributes.Lei), dto.Attributes.Entity.LegalName.Name, country, dto.Attributes.Bic);
+        return new LegalEntityRecord(new LEI(dto.Attributes.Lei), dto.Attributes.Entity.LegalName.Name, country, dto.Attributes.Bic ?? new List<string>());
     }
 }

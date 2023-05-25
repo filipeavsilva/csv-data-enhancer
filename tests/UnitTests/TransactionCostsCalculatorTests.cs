@@ -11,7 +11,7 @@ public class TransactionCostsCalculatorTests
     private readonly UTI _testUti = new("1030291281MARKITWIRE0000000000000112874138");
     private readonly ISIN _testIsin = new("EZD7JRS42975");
     private readonly LEI _testLei = new("BFXS5XCH7N0Y05NIXW11");
-    private const string TestBIC = "SGEGDEF1XXX";
+    private readonly List<string> TestBICs = new List<string>{"SGEGDEF1XXX"};
 
     [Theory]
     [InlineData(Country.GB, 1, 1, 0)]
@@ -25,7 +25,7 @@ public class TransactionCostsCalculatorTests
     public void WithExpectedCountries_CalculateTransactionCosts_ReturnsExpectedValue(Country country, decimal notionalValue, decimal rate, decimal expectedTransactionCosts)
     {
         var transaction = new Transaction(_testUti, _testIsin, notionalValue, Currency.EUR, Instant.MinValue, rate, _testLei);
-        var legalEntityRecord = new LegalEntityRecord(_testLei, string.Empty, country, TestBIC);
+        var legalEntityRecord = new LegalEntityRecord(_testLei, string.Empty, country, TestBICs);
 
         TransactionCostsCalculator.CalculateTransactionCosts(transaction, legalEntityRecord)
             .Should().BeApproximately(expectedTransactionCosts, precision: 0.000000001m);
@@ -39,7 +39,7 @@ public class TransactionCostsCalculatorTests
     public void WithZeroOrNegativeRate_CalculateTransactionCosts_ThrowsException(Country country, decimal rate)
     {
         var transaction = new Transaction(_testUti, _testIsin, 4.56m, Currency.EUR, Instant.MinValue, rate, _testLei);
-        var legalEntityRecord = new LegalEntityRecord(_testLei, string.Empty, country, TestBIC);
+        var legalEntityRecord = new LegalEntityRecord(_testLei, string.Empty, country, TestBICs);
 
         Action act = () => TransactionCostsCalculator.CalculateTransactionCosts(transaction, legalEntityRecord);
 
@@ -50,7 +50,7 @@ public class TransactionCostsCalculatorTests
     public void WithUnsupportedCountry_CalculateTransactionCosts_ThrowsException()
     {
         var transaction = new Transaction(_testUti, _testIsin, 4.56m, Currency.EUR, Instant.MinValue, 0.78m, _testLei);
-        var legalEntityRecord = new LegalEntityRecord(_testLei, string.Empty, Country.DE, TestBIC);
+        var legalEntityRecord = new LegalEntityRecord(_testLei, string.Empty, Country.DE, TestBICs);
 
         Action act = () => TransactionCostsCalculator.CalculateTransactionCosts(transaction, legalEntityRecord);
 

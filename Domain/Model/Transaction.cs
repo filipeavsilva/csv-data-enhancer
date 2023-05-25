@@ -21,14 +21,14 @@ public record EnrichedTransaction(
     decimal Rate,
     LEI EntityId,
     string EntityName,
-    string EntityBIC,
+    ICollection<string> EntityBICs,
     decimal TransactionCosts) : Transaction(Id, ISIN, NotionalValue, NotionalCurrency, Timestamp, Rate, EntityId)
 {
     public EnrichedTransaction(
-        Transaction transaction, string entityName, string entityBIC, decimal transactionCosts) :
+        Transaction transaction, string entityName, ICollection<string> entityBICs, decimal transactionCosts) :
         this(transaction.Id, transaction.ISIN, transaction.NotionalValue,
             transaction.NotionalCurrency, transaction.Timestamp, transaction.Rate, transaction.EntityId, entityName,
-            entityBIC, transactionCosts) { }
+            entityBICs, transactionCosts) { }
 }
 
 /// <summary> A Universal Transaction Identifier (for more information, see https://www.swift.com/your-needs/capital-markets/unique-transaction-identifier-securities-all-you-need-know)</summary>
