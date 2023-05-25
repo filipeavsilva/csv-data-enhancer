@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "tests\UnitTest
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataRetrieval", "DataRetrieval\DataRetrieval.csproj", "{69AF287A-6734-4B51-B183-B3EF4D2C7169}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API", "API\API.csproj", "{C8C20B1C-990A-45BA-92CC-1AA236CCCB18}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,6 +34,10 @@ Global
 		{69AF287A-6734-4B51-B183-B3EF4D2C7169}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{69AF287A-6734-4B51-B183-B3EF4D2C7169}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{69AF287A-6734-4B51-B183-B3EF4D2C7169}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C8C20B1C-990A-45BA-92CC-1AA236CCCB18}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C8C20B1C-990A-45BA-92CC-1AA236CCCB18}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C8C20B1C-990A-45BA-92CC-1AA236CCCB18}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C8C20B1C-990A-45BA-92CC-1AA236CCCB18}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{6CC11024-780B-4B90-BC00-7FF08AFA8F6A} = {C1757806-41D7-43F0-AAEF-19DCE21911B7}
