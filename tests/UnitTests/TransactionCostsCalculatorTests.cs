@@ -24,7 +24,7 @@ public class TransactionCostsCalculatorTests
     [InlineData(Country.NL, 0.753, 0.00321, 233.826439252)]
     public void WithExpectedCountries_CalculateTransactionCosts_ReturnsExpectedValue(Country country, decimal notionalValue, decimal rate, decimal expectedTransactionCosts)
     {
-        var transaction = new Transaction(_testUti, _testIsin, notionalValue, "EUR", Instant.MinValue, rate, _testLei);
+        var transaction = new Transaction(_testUti, _testIsin, notionalValue, "EUR", "Buy", Instant.MinValue, rate, _testLei);
         var legalEntityRecord = new LegalEntityRecord(_testLei, string.Empty, country, TestBICs);
 
         TransactionCostsCalculator.CalculateTransactionCosts(transaction, legalEntityRecord)
@@ -38,7 +38,7 @@ public class TransactionCostsCalculatorTests
     [InlineData(Country.NL, -1)]
     public void WithZeroOrNegativeRate_CalculateTransactionCosts_ThrowsException(Country country, decimal rate)
     {
-        var transaction = new Transaction(_testUti, _testIsin, 4.56m, "EUR", Instant.MinValue, rate, _testLei);
+        var transaction = new Transaction(_testUti, _testIsin, 4.56m, "EUR", "Sell", Instant.MinValue, rate, _testLei);
         var legalEntityRecord = new LegalEntityRecord(_testLei, string.Empty, country, TestBICs);
 
         Action act = () => TransactionCostsCalculator.CalculateTransactionCosts(transaction, legalEntityRecord);
@@ -49,7 +49,7 @@ public class TransactionCostsCalculatorTests
     [Fact]
     public void WithUnsupportedCountry_CalculateTransactionCosts_ThrowsException()
     {
-        var transaction = new Transaction(_testUti, _testIsin, 4.56m, "EUR", Instant.MinValue, 0.78m, _testLei);
+        var transaction = new Transaction(_testUti, _testIsin, 4.56m, "EUR", "Sell", Instant.MinValue, 0.78m, _testLei);
         var legalEntityRecord = new LegalEntityRecord(_testLei, string.Empty, Country.DE, TestBICs);
 
         Action act = () => TransactionCostsCalculator.CalculateTransactionCosts(transaction, legalEntityRecord);

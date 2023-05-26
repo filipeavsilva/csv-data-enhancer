@@ -10,24 +10,26 @@ namespace Domain.Model;
 
 // ReSharper disable InconsistentNaming (Reason: This file includes initialisms such as LEI and UTI that are more recognizable capitalized than if following PascalCase conventions)
 
-public record Transaction(UTI Id, ISIN ISIN, decimal NotionalValue, string NotionalCurrency, Instant Timestamp, decimal Rate, LEI EntityId);
+public record Transaction(UTI Id, ISIN ISIN, decimal NotionalValue, string NotionalCurrency, string TransactionType, Instant Timestamp, decimal Rate, LEI EntityId);
 
 public record EnrichedTransaction(
     UTI Id,
     ISIN ISIN,
     decimal NotionalValue,
     string NotionalCurrency,
+    string TransactionType,
     Instant Timestamp,
     decimal Rate,
     LEI EntityId,
     string EntityName,
     ICollection<string> EntityBICs,
-    decimal? TransactionCosts) : Transaction(Id, ISIN, NotionalValue, NotionalCurrency, Timestamp, Rate, EntityId)
+    decimal? TransactionCosts) : Transaction(Id, ISIN, NotionalValue, NotionalCurrency, TransactionType, Timestamp, Rate, EntityId)
 {
     public EnrichedTransaction(
         Transaction transaction, string entityName, ICollection<string> entityBICs, decimal? transactionCosts) :
         this(transaction.Id, transaction.ISIN, transaction.NotionalValue,
-            transaction.NotionalCurrency, transaction.Timestamp, transaction.Rate, transaction.EntityId, entityName,
+            transaction.NotionalCurrency, transaction.TransactionType, transaction.Timestamp, transaction.Rate,
+            transaction.EntityId, entityName,
             entityBICs, transactionCosts) { }
 }
 

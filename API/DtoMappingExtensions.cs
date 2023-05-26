@@ -10,6 +10,6 @@ public static class DtoMappingExtensions
     {
         var dateTimeOffset = DateTimeOffset.Parse(dto.TransactionDateTime);
         return new Transaction(new UTI(dto.TransactionIdentifier), new ISIN(dto.ISIN), dto.NotionalValue, dto.NotionalCurrency,
-            Instant.FromDateTimeOffset(dateTimeOffset), dto.Rate, new LEI(dto.LEI));
+            dto.TransactionType, Instant.FromDateTimeOffset(dateTimeOffset), dto.Rate, new LEI(dto.LEI));
     }
 }
