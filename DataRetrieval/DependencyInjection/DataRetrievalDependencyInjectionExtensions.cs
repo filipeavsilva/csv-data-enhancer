@@ -14,7 +14,7 @@ public static class DataRetrievalDependencyInjectionExtensions
         services.AddSingleton(new RestClient(options));
 
         services.AddTransient<TransactionRequestBatcher>();
-        services.AddTransient<ILegalEntityDataClient, GleifLegalEntityDataClient>();
+        services.AddSingleton<ILegalEntityDataClient, GleifLegalEntityDataClient>();
 
         return services;
     }

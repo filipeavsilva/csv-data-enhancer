@@ -14,7 +14,7 @@ public class EnrichTransactionsUseCase
         _enricher = enricher;
     }
 
-    public async Task<ICollection<EnrichedTransaction>> EnrichTransactions(ICollection<Transaction> transactionsToEnrich, CancellationToken cancellationToken)
+    public async Task<IEnumerable<EnrichedTransaction>> EnrichTransactions(ICollection<Transaction> transactionsToEnrich, CancellationToken cancellationToken)
     {
         var enrichedTransactions = new List<EnrichedTransaction>();
 
