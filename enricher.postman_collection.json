@@ -1,0 +1,35 @@
+{
+	"info": {
+		"_postman_id": "36965348-e4cf-49b6-ad7e-12316bbd9a98",
+		"name": "Data enricher collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "17750333"
+	},
+	"item": [
+		{
+			"name": "Enrich",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "file",
+					"file": {
+						"src": ""
+					}
+				},
+				"url": {
+					"raw": "http://localhost:7000/enrich",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "7000",
+					"path": [
+						"enrich"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
