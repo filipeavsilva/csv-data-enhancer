@@ -1,4 +1,5 @@
 ﻿using Domain.Ports;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RestSharp;
 
@@ -6,11 +7,16 @@ namespace DataRetrieval.DependencyInjection;
 
 public static class DataRetrievalDependencyInjectionExtensions
 {
-    public static IServiceCollection AddDataRetrievalService(this IServiceCollection services)
+    public static IServiceCollection AddDataRetrievalService(this IServiceCollection services, IConfiguration configuration)
     {
-        const string apiUrl = "https://api.gleif.org/api/v1"; //TODO: Get from configuration
+        var serviceConfiguration =
+            configuration.GetSection(GleifServiceOptions.GleifService).Get<GleifServiceOptions>();
+        if (serviceConfiguration is null)
+        {
+            throw new ArgumentException("GLEIF API URL not configured, please configure a valid URL");
+        }
 
-        var options = new RestClientOptions(apiUrl);
+        var options = new RestClientOptions(serviceConfiguration.Url);
         services.AddSingleton(new RestClient(options));
 
         services.AddTransient<TransactionRequestBatcher>();
@@ -18,4 +24,11 @@ public static class DataRetrievalDependencyInjectionExtensions
 
         return services;
     }
+}
+
+public record GleifServiceOptions
+{
+    public const string GleifService = nameof(GleifService);
+
+    public required string Url { get; init; }
 }

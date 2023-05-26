@@ -13,7 +13,7 @@ builder.Services.AddRazorPages().WithRazorPagesRoot("/Pages");
 
 builder.Services.AddCsvUtilities();
 builder.Services.AddDomainClasses();
-builder.Services.AddDataRetrievalService();
+builder.Services.AddDataRetrievalService(builder.Configuration);
 
 var app = builder.Build();
 
